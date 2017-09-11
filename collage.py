@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import pygame, sys
 from pygame import *
 import os.path
@@ -22,35 +23,24 @@ alph = 255
 rotate = 0
 old_count = len([f for f in os.listdir(src)])
 new_count = 0
-#global oldtrscnt
-#oldtrscnt = 0
+
 def Transfer():
-    oldTotal = 0
-    oldtrscnt = 0
     trscnt = (len([f for f in os.listdir(trs)]))
-    oldTotal = oldTotal + trscnt
-    if trscnt != 0:
-        print('finally!')
-        oldtrscnt = trscnt
-        #oldtrscnt = 0
-    print('transfer count = ' + str(trscnt))
-    print('old count = ' + str(oldtrscnt))
-    if (trscnt > 0) and (oldtrscnt == trscnt):
-        print('COMPLETE')
-    oldtrscnt = trscnt
     if trscnt > 0:
         for picture in os.listdir(trs):
             shutil.move(os.path.join(trs, picture), os.path.join(src, picture))
-    print("Last total: " + str(oldTotal))
 
 def dictfill():
+    #B: photos taken in landscape
+    #C: photos taken in portrait
     b = 0
     c = 0
     num_files = len([f for f in os.listdir(src)])
     print("number of files: " + str(num_files))
     for x in range(num_files):
         picture = (os.listdir(src)[x])
-        print(picture)
+        #print("x name: "+x)
+        #print("picture name: "+picture)
         im = Image.open(src+picture)
         exif_dict = piexif.load(im.info['exif'])
         if 274 in exif_dict['0th']:
@@ -67,75 +57,65 @@ def dictfill():
     print('c total: ' + str(c))
     return b,c
 
+def DictionaryCount(X):
+    bb = randint(0,b-1)
+    while bb in X:
+        bb = randint(0,b-1)
+    X.append(bb)
+    return X, image.load(src+b_dict[bb]['Name']), bb
+
+def DictionaryCountA(A,B):
+    A.pop()
+    B, C, D = DictionaryCount(B)
+    A.insert(0,C)
+    return A,B,C
+
+def TallDictionaryCount(X):
+    cc = randint(0,c-1)
+    while cc in X:
+        cc = randint(0,c-1)
+    X.append(cc)
+    tall1 =  image.load(src+c_dict[cc]['Name'])
+    if c_dict[cc]['Orientation'] == '6':
+        tall1 = transform.rotate(tall1,270)
+    return X, tall1
+        
 init()
-font.init()
-myfont = font.SysFont("monospace",15, True)
+#screen = display.set_mode((0,0),pygame.FULLSCREEN)
 screen = display.set_mode((0,0))
 done = False
 clock = time.Clock()
-screen.fill((1,1,1))
     
 Uploader.Testerb()
 Transfer()
 b,c = dictfill()
-#Transfer()
 while not done:
-    print("START OF FIRST")
-    #while (b == 0) and (c == 0):
-        #label=myfont.render("No pictures to display",True,(255,255,0))
-        #screen.blit(label,(100,100))
-        #Uploader.Testerb()
-        #Transfer()
-        #if (len([f for f in os.listdir(src)]) > 0):
-            #break
-        #b,c = dictfill()
-        #print('b = ' +str(b))
-        #print('c = ' +str(c))
-    #b,c = dictfill()
     if b != 0:
-        bb = randint(0,b-1)
-        wide1 = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide1a = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide2 = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide2a = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide3 = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide3a = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide4 = image.load(src+b_dict[bb]['Name'])
-        bb = randint(0,b-1)
-        wide4a = image.load(src+b_dict[bb]['Name'])
+        RandomBList = []
+        RandomBList,wide1,bb = DictionaryCount(RandomBList)
+        RandomBList,wide1a,bb = DictionaryCount(RandomBList)      
+        RandomBList,wide2,bb = DictionaryCount(RandomBList)      
+        RandomBList,wide2a,bb = DictionaryCount(RandomBList)
+        RandomBList,wide3,bb = DictionaryCount(RandomBList)
+        RandomBList,wide3a,bb = DictionaryCount(RandomBList)
+        RandomBList,wide4,bb = DictionaryCount(RandomBList)
+        RandomBList,wide4a,bb = DictionaryCount(RandomBList)
+        print("Random List B: ",RandomBList)
         wide1_list = [wide1,wide1a]
         wide2_list = [wide2,wide2a]
         wide3_list = [wide3,wide3a]
         wide4_list = [wide4,wide4a]
     if c != 0:
+        RandomCList=[]
         cc = randint(0,c-1)
-        tall1 = image.load(src+c_dict[cc]['Name'])
-        if c_dict[cc]['Orientation'] == '6':
-            tall1 = transform.rotate(tall1,270)
-        cc = randint(0,c-1)
-        tall1a = image.load(src+c_dict[cc]['Name'])
-        if c_dict[cc]['Orientation'] == '6':
-            tall1a = transform.rotate(tall1a,270)
-        cc = randint(0,c-1)
-        tall2 = image.load(src+c_dict[cc]['Name'])
-        if c_dict[cc]['Orientation'] == '6':
-            tall2 = transform.rotate(tall2,270)
-        cc = randint(0,c-1)
-        tall2a = image.load(src+c_dict[cc]['Name'])
-        if c_dict[cc]['Orientation'] == '6':
-            tall2a = transform.rotate(tall2a,270)
+        RandomCList, tall1 = TallDictionaryCount(RandomCList)
+        RandomCList, tall1a = TallDictionaryCount(RandomCList)
+        RandomCList, tall2 = TallDictionaryCount(RandomCList)
+        RandomCList, tall2a = TallDictionaryCount(RandomCList)
         tall1_list = [tall1,tall1a]
         tall2_list = [tall2,tall2a]
 
     while not done:
-        print("START OF SECOND")
-
         if alph > 0:
             alph -= 10
             if b != 0:
@@ -177,22 +157,13 @@ while not done:
         else:
             if b != 0:
                 print('b fill')
-                bb = randint(0,b-1)
-                wide1_list.pop()
-                alphas3 = image.load(src+b_dict[bb]['Name'])
-                wide1_list.insert(0,alphas3)
-                bb = randint(0,b-1)
-                wide2_list.pop()
-                alphas3 = image.load(src+b_dict[bb]['Name'])
-                wide2_list.insert(0,alphas3)
-                bb = randint(0,b-1)
-                wide3_list.pop()
-                alphas3 = image.load(src+b_dict[bb]['Name'])
-                wide3_list.insert(0,alphas3)
-                bb = randint(0,b-1)
-                wide4_list.pop()
-                alphas3 = image.load(src+b_dict[bb]['Name'])
-                wide4_list.insert(0,alphas3)
+                RandomBList = []
+                wide1_list,RandomBList,alphas3 = DictionaryCountA(wide1_list,RandomBList)
+                wide2_list,RandomBList,alphas3 = DictionaryCountA(wide2_list,RandomBList)
+                wide3_list,RandomBList,alphas3 = DictionaryCountA(wide3_list,RandomBList)
+                wide4_list,RandomBList,alphas3 = DictionaryCountA(wide4_list,RandomBList)
+                print("Random List B: ",RandomBList)
+                print('before crash')
             if c != 0:
                 print('c fill')
                 cc = randint(0,c-1)
@@ -207,18 +178,22 @@ while not done:
                 if c_dict[cc]['Orientation'] == '6':
                     alphas3 = transform.rotate(alphas3,270)
                 tall2_list.insert(0,alphas3)
-            alph = 255
+            Transfer()
+            Uploader.Testerb()
             new_count = len([f for f in os.listdir(src)])
-        Uploader.Testerb()
-        print('second uploader')
-        Transfer()
-        print('second transfer')
-        if (old_count != new_count):
-            print('second old count: ' + str(old_count))
-            print('second new count: ' + str(new_count))
-            dictfill()
-            old_count = new_count           
+            if (old_count != new_count):
+                dictfill()
+                old_count = new_count
+            alph = 255
 
-        for ev in event.get():
-            if ev.type == QUIT:
-                done = True
+            #new_count = len([f for f in os.listdir(src)])
+            #Uploader.Testerb()
+    print('i hate you')
+    Transfer()
+    if (old_count != new_count):
+        dictfill()
+        old_count = new_count           
+
+    for ev in event.get():
+        if ev.type == QUIT:
+            done = True
