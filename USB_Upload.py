@@ -33,8 +33,6 @@ class Uploader(object):
             for x in range(cnt):
                 if not Path(dst+title[x]).is_file():
                     shutil.copy(src+'/'+title[x],dst)
-            #call(["umount",src])
             v.set("Transfer complete, please remove media device")
             root.after(10000,root.destroy)
             root.mainloop()
-        #sleep(15)
