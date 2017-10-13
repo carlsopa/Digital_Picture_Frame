@@ -11,50 +11,49 @@ global b
 global c
 global b_dict
 global c_dict
-b_dict = {}
-c_dict = {}
+Landscape_dict = {}
+Portrait_dict = {}
 src = '/mnt/usb/usb/www/html/Frame/Photos/'
 trs = '/mnt/usb/usb/www/html/uploads/'
-b = 0
-c = 0
+LandscapePhotos = 0
+PortraitPhotos = 0
 x = 0
 y = 0
 alph = 255
 rotate = 0
 old_count = len([f for f in os.listdir(src)])
 new_count = 0
-
+#determines if any photos need to be moved from the temporary upload folder to main the main folder
 def Transfer():
     trscnt = (len([f for f in os.listdir(trs)]))
     if trscnt > 0:
         for picture in os.listdir(trs):
             shutil.move(os.path.join(trs, picture), os.path.join(src, picture))
-
+#Scans all the photos and places them into correspoding lists based on the meta data stored in the photos.
+#All photos tested from multiple devices had the same data
 def dictfill():
-    #B: photos taken in landscape
-    #C: photos taken in portrait
-    b = 0
-    c = 0
+    LandscapePhotos = 0
+    PortraitPhotos = 0
     num_files = len([f for f in os.listdir(src)])
+    #debugging print to determine number of photos to match up against later
     print("number of files: " + str(num_files))
     for x in range(num_files):
         picture = (os.listdir(src)[x])
-        #print("x name: "+x)
-        #print("picture name: "+picture)
         im = Image.open(src+picture)
         exif_dict = piexif.load(im.info['exif'])
         if 274 in exif_dict['0th']:
             if exif_dict['0th'][274] == 6:
-                c_dict[c] = {'Orientation' : '6', 'Name': picture, 'Width': im.size[0], 'Height': im.size[1]}
-                c +=1
+                Portrait_dict[PortraitPhotos] = {'Orientation' : '6', 'Name': picture, 'Width': im.size[0], 'Height': im.size[1]}
+                PortraitPhotos +=1
             if exif_dict['0th'][274] == 1:
-                b_dict[b] = {'Orientation' : '1', 'Name': picture, 'Width': im.size[0], 'Height': im.size[1]}
-                b += 1
+                Landscape_dict[LandscapePhotos] = {'Orientation' : '1', 'Name': picture, 'Width': im.size[0], 'Height': im.size[1]}
+                LandscapePhotos += 1
         else:
             c_dict[c] = {'Orientation' : '0', 'Name': picture, 'Width': im.size[0], 'Height': im.size[1]}
-            c += 1
-    print('b total: ' + str(b))
-    print('c total: ' + str(c))
+            PortraitPhotos += 1
+    #for debugging purposes, show the number of photos of each type
+    print('b total: ' + str(LandscapePhotos))
+    print('c total: ' + str(PortraitPhotos))
     return b,c
 
 def DictionaryCount(X):
@@ -76,21 +75,22 @@ def TallDictionaryCount(X):
         cc = randint(0,c-1)
     X.append(cc)
     tall1 =  image.load(src+c_dict[cc]['Name'])
-    if c_dict[cc]['Orientation'] == '6':
+    if PortraitPhotos_dict[cc]['Orientation'] == '6':
         tall1 = transform.rotate(tall1,270)
     return X, tall1
         
 init()
-#screen = display.set_mode((0,0),pygame.FULLSCREEN)
 screen = display.set_mode((0,0))
 done = False
 clock = time.Clock()
-    
+#code to upload any photos from a connected USB device    
 Uploader.Testerb()
+#Transfer any files that are being held in the temporary upload folder
 Transfer()
-b,c = dictfill()
+#P
+LandscapePhotos, PortraitPhotos = dictfill()
 while not done:
-    if b != 0:
+    if LandscapePhotos != 0:
         RandomBList = []
         RandomBList,wide1,bb = DictionaryCount(RandomBList)
         RandomBList,wide1a,bb = DictionaryCount(RandomBList)      
@@ -100,12 +100,11 @@ while not done:
         RandomBList,wide3a,bb = DictionaryCount(RandomBList)
         RandomBList,wide4,bb = DictionaryCount(RandomBList)
         RandomBList,wide4a,bb = DictionaryCount(RandomBList)
-        print("Random List B: ",RandomBList)
         wide1_list = [wide1,wide1a]
         wide2_list = [wide2,wide2a]
         wide3_list = [wide3,wide3a]
         wide4_list = [wide4,wide4a]
-    if c != 0:
+    if PortraitPhotos != 0:
         RandomCList=[]
         cc = randint(0,c-1)
         RandomCList, tall1 = TallDictionaryCount(RandomCList)
@@ -118,7 +117,7 @@ while not done:
     while not done:
         if alph > 0:
             alph -= 10
-            if b != 0:
+            if LandscapePhotos != 0:
                 wide1_list[1].set_alpha(alph)
                 wide1_list[1]= transform.scale(wide1_list[1],(515,328))
                 wide1_list[0]= transform.scale(wide1_list[0],(515,328))
@@ -131,14 +130,14 @@ while not done:
                 wide4_list[1].set_alpha(alph)
                 wide4_list[1]= transform.scale(wide4_list[1],(515,328))
                 wide4_list[0]= transform.scale(wide4_list[0],(515,328))
-            if c != 0:
+            if PortraitPhotos != 0:
                 tall1_list[1].set_alpha(alph)
                 tall1_list[1]= transform.scale(tall1_list[1],(328,515))
                 tall1_list[0]= transform.scale(tall1_list[0],(328,515))
                 tall2_list[1].set_alpha(alph)
                 tall2_list[1]= transform.scale(tall2_list[1],(328,515))
                 tall2_list[0]= transform.scale(tall2_list[0],(328,515))
-            if b != 0:
+            if LandscapePhotos != 0:
                 screen.blit(wide1_list[0],(137, 0))
                 screen.blit(wide1_list[1],(137, 0))
                 screen.blit(wide2_list[0],(559, 609))
@@ -147,7 +146,7 @@ while not done:
                 screen.blit(wide3_list[1],(1168, 95))
                 screen.blit(wide4_list[0],(1168, 517))
                 screen.blit(wide4_list[1],(1168, 517))
-            if c != 0:
+            if PortraitPhotos != 0:
                 screen.blit(tall1_list[0],(137, 421))
                 screen.blit(tall1_list[1],(137, 421))
                 screen.blit(tall2_list[0],(746, 0))
@@ -155,17 +154,13 @@ while not done:
 
             display.flip()
         else:
-            if b != 0:
-                print('b fill')
+            if LandscapePhotos != 0:
                 RandomBList = []
                 wide1_list,RandomBList,alphas3 = DictionaryCountA(wide1_list,RandomBList)
                 wide2_list,RandomBList,alphas3 = DictionaryCountA(wide2_list,RandomBList)
                 wide3_list,RandomBList,alphas3 = DictionaryCountA(wide3_list,RandomBList)
                 wide4_list,RandomBList,alphas3 = DictionaryCountA(wide4_list,RandomBList)
-                print("Random List B: ",RandomBList)
-                print('before crash')
-            if c != 0:
-                print('c fill')
+            if PortraitPhotos != 0:
                 cc = randint(0,c-1)
                 tall1_list.pop()
                 alphas3 = image.load(src+c_dict[cc]['Name'])
@@ -185,10 +180,7 @@ while not done:
                 dictfill()
                 old_count = new_count
             alph = 255
-
-            #new_count = len([f for f in os.listdir(src)])
-            #Uploader.Testerb()
-    print('i hate you')
+            
     Transfer()
     if (old_count != new_count):
         dictfill()
