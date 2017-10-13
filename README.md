@@ -19,3 +19,5 @@ Simple webpage for uploading photos.  Provides a button to click that will open 
 <li><i>USB_Upload.py</i><br>
 Python script that will detect any media devices connected through USB and then transfer the photos over to the raspberry pi.
 </ul>
+
+View a video explanation & demonstartion <a href="https://www.youtube.com/watch?v=A6njWGrcZDk">Digital Picture Frame</a>
